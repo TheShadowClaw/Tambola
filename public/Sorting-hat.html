@@ -280,7 +280,7 @@
             return fullName.trim().split(' ')[0].toLowerCase();
         }
 
-        function sortIntoHouses() {
+                function sortIntoHouses() {
             const input = document.getElementById('nameInput').value;
             const peopleList = input.split('\n')
                 .map(p => p.trim())
@@ -291,11 +291,12 @@
                 return;
             }
 
+            // Separate fixed group (matched by lowercased first name) and others
             const fixedGroupMembers = [];
             const individualsToSort = [];
 
             peopleList.forEach(person => {
-                const firstName = getFirstName(person);
+                const firstName = getFirstName(person); // already lowercased
                 if (FIXED_GROUP.includes(firstName)) {
                     fixedGroupMembers.push(person);
                 } else {
@@ -303,24 +304,26 @@
                 }
             });
 
+            const numHouses = houses.length;
+            const distribution = Array.from({ length: numHouses }, () => []);
+
+            // Shuffle and distribute remaining individuals round-robin for near-equal sizes
             const shuffledIndividuals = shuffleArray(individualsToSort);
-            const itemsToDistribute = [];
-            
-            if (fixedGroupMembers.length > 0) {
-                itemsToDistribute.push(fixedGroupMembers);
-            }
-            
-            shuffledIndividuals.forEach(person => {
-                itemsToDistribute.push([person]);
+            shuffledIndividuals.forEach((person, idx) => {
+                distribution[idx % numHouses].push(person);
             });
 
-            const shuffledItems = shuffleArray(itemsToDistribute);
-            const distribution = [[], [], [], []];
-            
-            shuffledItems.forEach((item, index) => {
-                const houseIndex = index % 4;
-                distribution[houseIndex].push(...item);
-            });
+            // Place the entire fixed group together into the house with the smallest size.
+            // If multiple houses tie for smallest size, pick one at random among them.
+            if (fixedGroupMembers.length > 0) {
+                const sizes = distribution.map(d => d.length);
+                const minSize = Math.min(...sizes);
+                const candidateIndices = sizes
+                    .map((s, i) => s === minSize ? i : -1)
+                    .filter(i => i >= 0);
+                const targetIndex = candidateIndices[Math.floor(Math.random() * candidateIndices.length)];
+                distribution[targetIndex].push(...fixedGroupMembers);
+            }
 
             displayResults(distribution);
         }
@@ -368,4 +371,5 @@
         }
     </script>
 </body>
+
 </html>
