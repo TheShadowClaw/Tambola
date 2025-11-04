@@ -14,6 +14,10 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+// Sorting Hat route
+app.get('/sorting-hat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'sorting-hat.html'));
+});
 
 // Game state
 let gameState = {
