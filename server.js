@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 });
 // Sorting Hat route
 app.get('/sorting-hat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'sorting-hat.html'));
+    res.sendFile(path.join(__dirname, 'public', 'Sorting-hat.html'));
 });
 
 // Game state
