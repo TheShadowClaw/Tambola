@@ -335,7 +335,7 @@
 
             displayResults(distribution);
         }
-        function displayResults(distribution) {
+          function displayResults(distribution) {
             document.getElementById('inputSection').classList.add('hidden');
             document.getElementById('resultsSection').classList.remove('hidden');
 
@@ -346,12 +346,15 @@
                 const houseDiv = document.createElement('div');
                 houseDiv.className = 'house';
 
-                const members = distribution[idx];
+                const members = distribution[idx] || [];
                 const memberCount = members.length;
+
+                // Shuffle members for display so the fixed group doesn't appear together visually
+                const displayMembers = shuffleArray([...members]);
 
                 let membersHTML = '';
                 if (memberCount > 0) {
-                    membersHTML = members.map(member => 
+                    membersHTML = displayMembers.map(member =>
                         `<div class="member ${house.memberClass}">${member}</div>`
                     ).join('');
                 } else {
@@ -381,6 +384,7 @@
 </body>
 
 </html>
+
 
 
 
