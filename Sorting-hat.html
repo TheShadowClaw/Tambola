@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Hat - Hogwarts House Sorter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #1a1a4d 50%, #0d1b3d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #fbbf24;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #d1d5db;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+        }
+
+        .hint {
+            color: #d1d5db;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .sort-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            background: #fbbf24;
+            color: #1a0033;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+        }
+
+        .sort-button:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+        }
+
+        .houses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .house {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .house-header {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .house-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .house-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .gryffindor-header {
+            background: #dc2626;
+            border-bottom: 4px solid #991b1b;
+        }
+
+        .hufflepuff-header {
+            background: #eab308;
+            border-bottom: 4px solid #a16207;
+        }
+
+        .ravenclaw-header {
+            background: #2563eb;
+            border-bottom: 4px solid #1e40af;
+        }
+
+        .slytherin-header {
+            background: #16a34a;
+            border-bottom: 4px solid #15803d;
+        }
+
+        .house-members {
+            padding: 25px;
+            min-height: 150px;
+        }
+
+        .member {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+            background: #f9fafb;
+        }
+
+        .gryffindor-member {
+            border: 2px solid #dc2626;
+            color: #dc2626;
+        }
+
+        .hufflepuff-member {
+            border: 2px solid #ca8a04;
+            color: #ca8a04;
+        }
+
+        .ravenclaw-member {
+            border: 2px solid #2563eb;
+            color: #2563eb;
+        }
+
+        .slytherin-member {
+            border: 2px solid #16a34a;
+            color: #16a34a;
+        }
+
+        .empty-house {
+            color: #9ca3af;
+            text-align: center;
+            font-style: italic;
+            padding: 40px 0;
+        }
+
+        .reset-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .reset-button:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .houses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪄 Sorting Hat</h1>
+            <p>Divide your group into Hogwarts Houses</p>
+        </div>
+
+        <div id="inputSection" class="input-section">
+            <label for="nameInput">👥 Enter Names (one per line)</label>
+            <textarea 
+                id="nameInput" 
+                placeholder="Harry Potter&#10;Hermione Granger&#10;Ron Weasley&#10;Draco Malfoy&#10;Luna Lovegood"></textarea>
+            
+            <br><br>
+            <button class="sort-button" onclick="sortIntoHouses()">🔀 Sort into Houses!</button>
+        </div>
+
+        <div id="resultsSection" class="hidden">
+            <div class="houses-grid" id="housesGrid"></div>
+            <button class="reset-button" onclick="resetSorting()">🔀 Sort Again</button>
+        </div>
+    </div>
+
+    <script>
+        const FIXED_GROUP = ['roshan', 'vaishnavi', 'mrunal'];
+        
+        const houses = [
+            { name: 'Gryffindor', headerClass: 'gryffindor-header', memberClass: 'gryffindor-member' },
+            { name: 'Hufflepuff', headerClass: 'hufflepuff-header', memberClass: 'hufflepuff-member' },
+            { name: 'Ravenclaw', headerClass: 'ravenclaw-header', memberClass: 'ravenclaw-member' },
+            { name: 'Slytherin', headerClass: 'slytherin-header', memberClass: 'slytherin-member' }
+        ];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function getFirstName(fullName) {
+            return fullName.trim().split(' ')[0].toLowerCase();
+        }
+
+        function sortIntoHouses() {
+            const input = document.getElementById('nameInput').value;
+            const peopleList = input.split('\n')
+                .map(p => p.trim())
+                .filter(p => p.length > 0);
+
+            if (peopleList.length === 0) {
+                alert('Please enter at least one person!');
+                return;
+            }
+
+            const fixedGroupMembers = [];
+            const individualsToSort = [];
+
+            peopleList.forEach(person => {
+                const firstName = getFirstName(person);
+                if (FIXED_GROUP.includes(firstName)) {
+                    fixedGroupMembers.push(person);
+                } else {
+                    individualsToSort.push(person);
+                }
+            });
+
+            const shuffledIndividuals = shuffleArray(individualsToSort);
+            const itemsToDistribute = [];
+            
+            if (fixedGroupMembers.length > 0) {
+                itemsToDistribute.push(fixedGroupMembers);
+            }
+            
+            shuffledIndividuals.forEach(person => {
+                itemsToDistribute.push([person]);
+            });
+
+            const shuffledItems = shuffleArray(itemsToDistribute);
+            const distribution = [[], [], [], []];
+            
+            shuffledItems.forEach((item, index) => {
+                const houseIndex = index % 4;
+                distribution[houseIndex].push(...item);
+            });
+
+            displayResults(distribution);
+        }
+
+        function displayResults(distribution) {
+            document.getElementById('inputSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+
+            const grid = document.getElementById('housesGrid');
+            grid.innerHTML = '';
+
+            houses.forEach((house, idx) => {
+                const houseDiv = document.createElement('div');
+                houseDiv.className = 'house';
+
+                const members = distribution[idx];
+                const memberCount = members.length;
+
+                let membersHTML = '';
+                if (memberCount > 0) {
+                    membersHTML = members.map(member => 
+                        `<div class="member ${house.memberClass}">${member}</div>`
+                    ).join('');
+                } else {
+                    membersHTML = '<div class="empty-house">No members sorted yet</div>';
+                }
+
+                houseDiv.innerHTML = `
+                    <div class="house-header ${house.headerClass}">
+                        <h2>${house.name}</h2>
+                        <p>${memberCount} ${memberCount === 1 ? 'member' : 'members'}</p>
+                    </div>
+                    <div class="house-members">
+                        ${membersHTML}
+                    </div>
+                `;
+
+                grid.appendChild(houseDiv);
+            });
+        }
+
+        function resetSorting() {
+            document.getElementById('inputSection').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
