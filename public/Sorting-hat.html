@@ -280,7 +280,7 @@
             return fullName.trim().split(' ')[0].toLowerCase();
         }
 
-                function sortIntoHouses() {
+        function sortIntoHouses() {
             const input = document.getElementById('nameInput').value;
             const peopleList = input.split('\n')
                 .map(p => p.trim())
@@ -291,7 +291,6 @@
                 return;
             }
 
-            // Separate fixed group (matched by lowercased first name) and others
             const fixedGroupMembers = [];
             const individualsToSort = [];
 
@@ -307,27 +306,42 @@
             const numHouses = houses.length;
             const distribution = Array.from({ length: numHouses }, () => []);
 
-            // Shuffle and distribute remaining individuals round-robin for near-equal sizes
-            const shuffledIndividuals = shuffleArray(individualsToSort);
-            shuffledIndividuals.forEach((person, idx) => {
-                distribution[idx % numHouses].push(person);
-            });
-
-            // Place the entire fixed group together into the house with the smallest size.
-            // If multiple houses tie for smallest size, pick one at random among them.
+            // Put the fixed group together into one randomly chosen house (if any)
+            let fixedHouseIndex = -1;
             if (fixedGroupMembers.length > 0) {
-                const sizes = distribution.map(d => d.length);
-                const minSize = Math.min(...sizes);
-                const candidateIndices = sizes
-                    .map((s, i) => s === minSize ? i : -1)
-                    .filter(i => i >= 0);
-                const targetIndex = candidateIndices[Math.floor(Math.random() * candidateIndices.length)];
-                distribution[targetIndex].push(...fixedGroupMembers);
+                fixedHouseIndex = Math.floor(Math.random() * numHouses);
+                distribution[fixedHouseIndex].push(...fixedGroupMembers);
+            }
+
+            // Shuffle remaining individuals and compute equal quotas
+            const shuffledIndividuals = shuffleArray(individualsToSort);
+            const remaining = shuffledIndividuals.length;
+            const base = Math.floor(remaining / numHouses);
+            let extra = remaining % numHouses;
+
+            // Build quotas and assign extras to random houses to avoid always favouring first indices
+            const quotas = new Array(numHouses).fill(base);
+            if (extra > 0) {
+                const order = shuffleArray(Array.from({ length: numHouses }, (_, i) => i));
+                for (let i = 0; i < extra; i++) quotas[order[i]]++;
+            }
+
+            // Fill each house up to its quota with shuffled individuals
+            let idx = 0;
+            for (let h = 0; h < numHouses; h++) {
+                const q = quotas[h];
+                for (let k = 0; k < q && idx < shuffledIndividuals.length; k++) {
+                    distribution[h].push(shuffledIndividuals[idx++]);
+                }
+            }
+
+            // Fallback: if anything left (shouldn't happen), distribute round-robin
+            while (idx < shuffledIndividuals.length) {
+                distribution[idx % numHouses].push(shuffledIndividuals[idx++]);
             }
 
             displayResults(distribution);
         }
-
         function displayResults(distribution) {
             document.getElementById('inputSection').classList.add('hidden');
             document.getElementById('resultsSection').classList.remove('hidden');
@@ -373,3 +387,4 @@
 </body>
 
 </html>
+
