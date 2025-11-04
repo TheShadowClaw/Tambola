@@ -266,7 +266,15 @@
             { name: 'Ravenclaw', headerClass: 'ravenclaw-header', memberClass: 'ravenclaw-member' },
             { name: 'Slytherin', headerClass: 'slytherin-header', memberClass: 'slytherin-member' }
         ];
-
+        function shuffle(array) {
+  let currentIndex = array.length;
+  while (currentIndex != 0) {
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array; // ✅ return it
+}
         function shuffleArray(array) {
             const newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -321,6 +329,9 @@
                 const houseIndex = index % 4;
                 distribution[houseIndex].push(...item);
             });
+            distribution.forEach((item, index)=>{
+                distribution[index]=shuffle(item)
+            });
 
             displayResults(distribution);
         }
@@ -360,6 +371,7 @@
                 grid.appendChild(houseDiv);
             });
         }
+        
 
         function resetSorting() {
             document.getElementById('inputSection').classList.remove('hidden');
@@ -369,5 +381,6 @@
 </body>
 
 </html>
+
 
 
